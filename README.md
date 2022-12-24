@@ -1,5 +1,5 @@
 # Pedagogy-bot
-Pedagogy-bot is a python based bot that scraps the Pedagogy (EDU) web site and alerts me when the kids has homewaorks to complete. this bot is based on Ofek-bot (https://github.com/t0mer/ofek-bot) made by the Amzazing Tomer Klein (https://github.com/t0mer)
+Pedagogy-bot is a python based bot that scraps the Pedagogy (EDU) web site and alerts me when the kids has homeworks to complete. this bot is based on Ofek-bot (https://github.com/t0mer/ofek-bot) made by the Amzazing Tomer Klein (https://github.com/t0mer)
 
 ## Features
  - Monitor kids homework status
