@@ -3,7 +3,7 @@ LABEL maintainer="benami.omri@gmail.com"
 
 ENV PYTHONIOENCODING utf-8
 ENV LANG C.UTF-8
-ENV NOTIFIERS ""
+ENV SCHEDULES  ""
 RUN apt update -yqq
 
 RUN apt -yqq install python3-pip && \
