@@ -4,7 +4,7 @@ Pedagogy-bot is a python based bot that scraps the Pedagogy (EDU) web site and a
 ## Features
  - Monitor kids homework status
  - Schedule when to run.
- - Creates a TXT file which being monitored as an Home Assistant monitor)
+ - Creates a TXT file which being monitored as an Home Assistant sensor)
 
 
 ## Components and Frameworks used in Ofek-bot
