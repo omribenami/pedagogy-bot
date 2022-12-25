@@ -54,17 +54,18 @@ kids:
 
 
 #### create Home Assistant Sensor ###
-
+```
 sensor:
  - platform: command_line
    name: homeworks
    command: "cat /path/to/config/homework.yaml"
    value_template: '{{value}}' 
    scan_interval: 5
-
+```
 
 ####  create Home Assistant on/off Sensor ###
 
+```
 sensor:
  - platform: template
      sensors:
@@ -76,3 +77,4 @@ sensor:
             {% else %} 
               on 
             {% endif -%}
+```
