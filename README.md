@@ -7,7 +7,7 @@ Pedagogy-bot is a python based bot that scraps the Pedagogy (EDU) web site and a
  - Creates a TXT file which being monitored as an Home Assistant sensor)
 
 
-## Components and Frameworks used in Ofek-bot
+## Components and Frameworks used in pedagogy
 * [Loguru](https://pypi.org/project/loguru/) For logging.
 * [Schedule](https://pypi.org/project/schedule/) For alerts schedule.
 * [Selenium](https://selenium-python.readthedocs.io/) For data scrapping.
