@@ -51,3 +51,28 @@ kids:
 
 
 ```
+
+
+#### create Home Assistant Sensor ###
+
+sensor:
+ - platform: command_line
+   name: homeworks
+   command: "cat /path/to/config/homework.yaml"
+   value_template: '{{value}}' 
+   scan_interval: 5
+
+
+####  create Home Assistant on/off Sensor ###
+
+sensor:
+ - platform: template
+     sensors:
+       homework_switch:
+          friendly_name: Homework_switch
+          value_template: >
+            {% if states("sensor.homeworks_2") == '' %}
+              off 
+            {% else %} 
+              on 
+            {% endif -%}
