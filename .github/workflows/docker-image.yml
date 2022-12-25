@@ -41,5 +41,5 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            techblog/ofek-bot:latest
-            techblog/ofek-bot:${{ steps.getSemver.outputs.semver }}
+            omribenami/pedagogy-bot:latest
+            omribenami/pedagogy-bot:${{ steps.getSemver.outputs.semver }}
