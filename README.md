@@ -17,7 +17,7 @@ Pedagogy is a docker based application that can be installed using docker compos
 ```
 version: "3.6"
 services:
-  ofek:
+  pedagogy-bot:
     image: omribenami/pedagogy-bot
     container_name: pedagogy-bot
     restart: always
