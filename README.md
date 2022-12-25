@@ -33,8 +33,8 @@ services:
 ### Volumes
 pedagogy-bot is using the kids login credentials to the pedagogy website.
 In the config folder there is a config.yaml files for saving the credentials.
-in order to find the school value please navigate to https://pedagogy.co.il/parent.html#!/login -> click rght mouse button on the school field 
-and choose "inspect" -> open the drop down  triangle and find the required value (e.g """<option value="sc_tops_hi6"> חט"ב ועליונה - פדגוגי</option>""" ). 
+in order to find the school value please navigate to https://pedagogy.co.il/parent.html#!/login -> click right mouse button on the school field 
+and choose "inspect" -> open the drop down  triangle and find the required value (e.g ```<option value="sc_tops_hi6"> חט"ב ועליונה - פדגוגי</option>``` ). 
 Make sure to create the config file in the following structure:
 
 ```
