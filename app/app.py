@@ -5,6 +5,7 @@ import os
 import schedule
 import time
 import re
+import json
 from os import path
 from loguru import logger
 from selenium import webdriver
@@ -17,32 +18,34 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import Select
+from datetime import date
 
 
-SCHEDULES=os.getenv("SCHEDULES")
 
+SCHEDULES = os.getenv("SCHEDULES")
 
 class Crawler:
     def __init__(self):
         self.kids = []
         self.delay = 5
         self.pedagogy_url = "https://pedagogy.co.il/parent.html#!/login"
+        self.pedagogy_hw_url = "https://pedagogy.co.il/parent.html#!/learning"
+        self.pedagogy_msg_url = "https://pedagogy.co.il/parent.html#!/messages"
+        self.pedagogy_evt_url = "https://pedagogy.co.il/parent.html#!/periodic"
         self.user_field = "userid"
         self.password_field = "userpwd"
         self.school_field = "scn"
         self.edu_login_btn = '//*[@id="main-app"]/div/div/div/div/div/div[3]/div/button'
-        self.todo = ""
-        self.tofix = ""
-        self.wating = ""
-        self.checked = ""
-        self.apobj = apprise.Apprise()
+        self.json_dict = {}
         self.notifires = os.getenv("NOTIFIERS")
         self.config_path = 'config/config.yaml'
         self.get_kids()
+        self.events = list()
+        self.latest_event = '//*[@id="main-app"]/div/div/div/div[3]/div/ul/li[1]'
+        self.homeworks = {}
+        self.date_today = str(date.today().strftime("%d/%m/%y")).replace("-", "/")
 
-
-
-#### Setting ChromeOptions ####
+    #### Setting ChromeOptions ####
     def init_browser(self):
         logger.info("Initializing browser")
         self.options = webdriver.ChromeOptions()
@@ -52,16 +55,15 @@ class Crawler:
         self.options.add_argument("--no-sandbox")
         self.options.add_argument('--start-maximized')
         self.options.add_argument("--disable-dev-shm-usage")
-        self.browser = webdriver.Chrome(service=Service(ChromeDriverManager().install()),options=self.options)
-            # webdriver.Chrome(executable_path=ChromeDriverManager(version='106.0.5249.61').install(),options=self.options)
-
+        self.browser = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=self.options)
+        # webdriver.Chrome(executable_path=ChromeDriverManager(version='106.0.5249.61').install(),options=self.options)
 
     def get_kids(self):
         try:
             logger.info("Loading kids list")
             if not path.exists(self.config_path):
                 shutil.copy('config.yaml', self.config_path)
-            with open("config/config.yaml",'r',encoding='utf-8') as stream:
+            with open("config/config.yaml", 'r', encoding='utf-8') as stream:
                 try:
                     self.kids = yaml.safe_load(stream)
                 except yaml.YAMLError as exc:
@@ -69,39 +71,68 @@ class Crawler:
         except Exception as e:
             logger.error(str(e))
 
-
-    def crowl(self, username, password, school):
-        logger.info("Crowling")
+    def crowl(self, username, password, school, name):
+        logger.info("Crawling")
         try:
 
             # Open pedagogy login page
             self.browser.get(self.pedagogy_url)
             time.sleep(1)
 
-            WebDriverWait(self.browser, self.delay).until(EC.presence_of_element_located((By.ID, self.user_field))).send_keys(username)  # Enter Username
-            WebDriverWait(self.browser, self.delay).until(EC.presence_of_element_located((By.ID, self.password_field))).send_keys(password)  # enter password
-            Select(self.browser.find_element(By.ID, self.school_field)).select_by_value(school)  # enter school selection
+            WebDriverWait(self.browser, self.delay).until(
+                EC.presence_of_element_located((By.ID, self.user_field))).send_keys(username)  # Enter Username
+            WebDriverWait(self.browser, self.delay).until(
+                EC.presence_of_element_located((By.ID, self.password_field))).send_keys(password)  # enter password
+            Select(self.browser.find_element(By.ID, self.school_field)).select_by_value(
+                school)  # enter school selection
 
             # time.sleep(1)
             self.browser.find_element("xpath", self.edu_login_btn).click()  # click login button
             time.sleep(3)  # wait for page to load
 
             # Scrap tasks status
-            if WebDriverWait(self.browser, self.delay).until(EC.url_matches("https://pedagogy.co.il/parent.html#!/messages")):
+            if WebDriverWait(self.browser, self.delay).until(EC.url_matches(self.pedagogy_msg_url)):
                 logger.info("Logged in successfully")
                 time.sleep(3)
             else:
                 logger.error(str("Login failed"))
-            logger.info("Scrapping...")
-            self.browser.get("https://pedagogy.co.il/parent.html#!/learning")
+
+            logger.info("Scrapping homeworks...")
+            self.browser.get(self.pedagogy_hw_url)
             time.sleep(3)
             data = self.browser.find_elements(By.CLASS_NAME, 'col-data')
-            with open('config/homework.yaml', 'w', encoding='utf8') as txt:
-                for i in data:
-                    if  "שיעורי" in i.text or "להביא" in i.text:
-                        print("----------")
-                        print(i.text)
-                        txt.write(i.text + '')
+            for i in data:
+                if "שיעורי" in i.text or "להביא" in i.text:
+                    print("----------")
+                    prof = i.find_elements(By.TAG_NAME, 'strong')
+                    task = i.find_elements(By.TAG_NAME, 'div')
+                    for p in prof:
+                        print(p.text)
+                        for t in task:
+                            sub_task = t.find_elements(By.TAG_NAME, 'div')
+                            for s in sub_task:
+                                if "שיעורי" in s.text or "להביא" in s.text:
+                                    print(s.text)
+                                    self.homeworks[p.text] = s.text
+            self.json_dict['homeworks'] = self.homeworks
+
+            logger.info("Scrapping events...")
+            self.browser.get(self.pedagogy_evt_url)
+            time.sleep(3)
+            events = self.browser.find_elements(By.XPATH, self.latest_event)
+            for i in events:
+                if self.date_today in i.text:
+                    sub = i.find_elements(By.TAG_NAME, 'strong')
+                    print("----------")
+                    print(f":דוח הארות והערות")
+                    for s in sub:
+                        print(s.text)
+                        self.events.append(s.text)
+
+            self.json_dict['events'] = self.events
+            with open('config/homework.json', 'w', encoding='utf-8') as json_file:
+                json.dump(self.json_dict, json_file, indent=4, ensure_ascii=False)
+
         except Exception as e:
             logger.error(str(e))
 
@@ -114,8 +145,7 @@ def main():
                 break
             logger.info("Getting tasks for: " + kid["name"])
             crawler.init_browser()
-            crawler.crowl(str(kid['username']),str(kid['password']),str(kid['school']))
-            title = "מצב שיעורי בית של " + kid['name']
+            crawler.crowl(str(kid['username']), str(kid['password']), str(kid['school']), str(kid['name']))
             logger.debug("Closing browser")
             crawler.browser.quit()
     except Exception as e:
@@ -138,5 +168,3 @@ if __name__ == "__main__":
             time.sleep(1)
     except Exception as e:
         logger.error(str(e))
-
-
