@@ -90,7 +90,7 @@ sensor:
             {% else %} 
               on 
             {% endif -%}
-```
+
 
 sensor:
  - platform: template
