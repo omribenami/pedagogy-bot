@@ -3,8 +3,9 @@ Pedagogy-bot is a python based bot that scraps the Pedagogy (EDU) web site and a
 
 ## Features
  - Monitor kids homework status
+ - Monitor kids events(goodwork, late, etc...) status
  - Schedule when to run.
- - Creates a TXT file which being monitored as an Home Assistant sensor)
+ - Creates a JSON file which is being monitored as an Home Assistant sensors
 
 
 ## Components and Frameworks used in pedagogy
@@ -53,15 +54,27 @@ kids:
 ```
 
 
-#### create Home Assistant Sensor ###
+#### create Home Assistant Sensors ###
 ```
-sensor:
- - platform: command_line
-   name: homeworks
-   command: "cat /path/to/config/homework.yaml"
-   value_template: '{{value}}' 
-   scan_interval: 5
+- platform: command_line
+  name: homeworks
+  command: "cat config/homework.json"
+  value_template: {{value_json.homeworks}}
+  json_attributes:
+    - homeworks
+  scan_interval: 5
 ```
+
+```
+- platform: command_line
+  name: homeworks
+  command: "cat config/homework.json"
+  value_template: {{value_json.events}}
+  json_attributes:
+    - events
+  scan_interval: 5
+```
+
 
 ####  create Home Assistant on/off Sensor ###
 
@@ -72,7 +85,20 @@ sensor:
        homework_switch:
           friendly_name: Homework_switch
           value_template: >
-            {% if states("sensor.homeworks_2") == '' %}
+            {% if states("sensor.homework") == '' %}
+              off 
+            {% else %} 
+              on 
+            {% endif -%}
+```
+
+sensor:
+ - platform: template
+     sensors:
+       events_switch:
+          friendly_name: events_switch
+          value_template: >
+            {% if states("sensor.events") == '' %}
               off 
             {% else %} 
               on 
