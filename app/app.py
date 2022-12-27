@@ -107,12 +107,12 @@ class Crawler:
                     prof = i.find_elements(By.TAG_NAME, 'strong')
                     task = i.find_elements(By.TAG_NAME, 'div')
                     for p in prof:
-                        print(p.text.replace(" הוראה בכיתה", ": "))
+                        logger.info(p.text.replace(" הוראה בכיתה", ": "))
                         for t in task:
                             sub_task = t.find_elements(By.TAG_NAME, 'div')
                             for s in sub_task:
                                 if "שיעורי" in s.text or "להביא" in s.text:
-                                    print(s.text)
+                                    logger.info(s.text)
                                     self.homeworks.append(p.text.replace(" הוראה בכיתה", ": ")+s.text)
             self.json_dict['homeworks'] = self.homeworks
 
@@ -123,10 +123,10 @@ class Crawler:
             for i in events:
                 if self.date_today in i.text:
                     sub = i.find_elements(By.TAG_NAME, 'strong')
-                    print("----------")
-                    print(f":דוח הארות והערות")
+                    logger.info("----------")
+                    logger.info(f":דוח הארות והערות")
                     for s in sub:
-                        print(s.text)
+                        logger.info(s.text)
                         self.events.append(s.text)
 
             self.json_dict['events'] = self.events
