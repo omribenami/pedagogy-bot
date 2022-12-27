@@ -42,7 +42,7 @@ class Crawler:
         self.get_kids()
         self.events = list()
         self.latest_event = '//*[@id="main-app"]/div/div/div/div[3]/div/ul/li[1]'
-        self.homeworks = {}
+        self.homeworks = list()
         self.date_today = str(date.today().strftime("%d/%m/%y")).replace("-", "/")
 
     #### Setting ChromeOptions ####
@@ -107,13 +107,13 @@ class Crawler:
                     prof = i.find_elements(By.TAG_NAME, 'strong')
                     task = i.find_elements(By.TAG_NAME, 'div')
                     for p in prof:
-                        print(p.text)
+                        print(p.text.replace(" הוראה בכיתה", ": "))
                         for t in task:
                             sub_task = t.find_elements(By.TAG_NAME, 'div')
                             for s in sub_task:
                                 if "שיעורי" in s.text or "להביא" in s.text:
                                     print(s.text)
-                                    self.homeworks[p.text] = s.text
+                                    self.homeworks.append(p.text.replace(" הוראה בכיתה", ": ")+s.text)
             self.json_dict['homeworks'] = self.homeworks
 
             logger.info("Scrapping events...")
