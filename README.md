@@ -56,23 +56,28 @@ kids:
 
 #### create Home Assistant Sensors ###
 ```
-- platform: command_line
-  name: homeworks
-  command: "cat config/homework.json"
-  value_template: {{value_json.homeworks}}
-  json_attributes:
-    - homeworks
-  scan_interval: 5
-```
+ - platform: command_line
+   name: homeworks
+   command: "cat config/homework.json"
+   value_template: >- 
+     {% for i in  state_attr('sensor.homeworks', 'homeworks' ) %}
+      {{ i}}
+     {% endfor %}
+   json_attributes: 
+     - homeworks
+   scan_interval: 5
 
-```
-- platform: command_line
-  name: homeworks
-  command: "cat config/homework.json"
-  value_template: {{value_json.events}}
-  json_attributes:
-    - events
-  scan_interval: 5
+ - platform: command_line
+   name: events
+   command: "cat config/homework.json"
+   value_template: >-
+    {% for i in  state_attr('sensor.events', 'events' ) %}
+      {{ i}}
+     {% endfor %}
+   json_attributes: 
+     - events
+   scan_interval: 5
+   
 ```
 
 
