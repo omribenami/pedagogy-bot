@@ -131,6 +131,7 @@ class Crawler:
 
             self.json_dict['events'] = self.events
             with open('config/homework.json', 'w', encoding='utf-8') as json_file:
+                json_file.truncate()
                 json.dump(self.json_dict, json_file, indent=4, ensure_ascii=False)
 
         except Exception as e:
