@@ -111,7 +111,7 @@ class Crawler:
                         for t in task:
                             sub_task = t.find_elements(By.TAG_NAME, 'div')
                             for s in sub_task:
-                                if "שיעורי" in s.text or "להביא" in s.text:
+                                if "שיעורי" in s.text:
                                     logger.info(s.text)
                                     self.homeworks.append(p.text.replace(" הוראה בכיתה", ": ")+s.text)
             self.json_dict['homeworks'] = self.homeworks
