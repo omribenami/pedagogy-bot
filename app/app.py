@@ -34,7 +34,7 @@ class Crawler:
         self.pedagogy_evt_url = "https://pedagogy.co.il/parent.html#!/periodic"
         self.user_field = "userid"
         self.password_field = "userpwd"
-        self.school_field = "scn"
+        self.school_field = '//*[@id="scn"]'
         self.edu_login_btn = '//*[@id="main-app"]/div/div/div/div/div/div[3]/div/button'
         self.json_dict = {}
         self.notifires = os.getenv("NOTIFIERS")
@@ -83,7 +83,7 @@ class Crawler:
                 EC.presence_of_element_located((By.ID, self.user_field))).send_keys(username)  # Enter Username
             WebDriverWait(self.browser, self.delay).until(
                 EC.presence_of_element_located((By.ID, self.password_field))).send_keys(password)  # enter password
-            Select(self.browser.find_element(By.ID, self.school_field)).select_by_value(
+            Select(self.browser.find_element(By.XPATH, self.school_field)).select_by_value(
                 school)  # enter school selection
 
             # time.sleep(1)
@@ -130,6 +130,13 @@ class Crawler:
                         self.events.append(s.text)
 
             self.json_dict['events'] = self.events
+
+	    if os.path.exists('config/homework.json'):
+    	    	os.remove('config/homework.json')
+
+            if os.path.exists('config/homework.json'):
+        	os.remove('config/homework.json')
+
             with open('config/homework.json', 'w', encoding='utf-8') as json_file:
                 json_file.truncate()
                 json.dump(self.json_dict, json_file, indent=4, ensure_ascii=False)
