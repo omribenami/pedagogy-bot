@@ -130,6 +130,10 @@ class Crawler:
                         self.events.append(s.text)
 
             self.json_dict['events'] = self.events
+
+	    if os.path.exists('config/homework.json'):
+    	    	os.remove('config/homework.json')
+
             if os.path.exists('config/homework.json'):
         	os.remove('config/homework.json')
 
